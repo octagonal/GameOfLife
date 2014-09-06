@@ -22,7 +22,6 @@ Features
 ----------
 
 * Multiple GOL layers, the opacity of the layers is automatically changed depending on how many layers there are
-* Manually add cells by clicking on them (they turn up white)
 * Take screenshots using the `screenShotWrapper()` function
 * Listen to the pitch of the game (depends on how many cells are present, kinda)
 * The hue of the cells is based on how long they've been alive, beyond 255 cycles the hue stays at 255.
@@ -31,6 +30,7 @@ Controls
 ----------
 
 * Pause the game using the `space` button
+* Manually add cells by clicking on them (they turn up white)
 * Manually reseed the games using the `up` button
 * Manually progress the games using the `down` button (only useful in paused mode)
 
