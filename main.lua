@@ -41,25 +41,6 @@ function love.mousepressed(x,y,button)
 	--]]
 end
 
-function drawSeed(threshold)
-	local threshold = threshold or 0.9
-	local seedMap = {}
-	for i=1,tileSize do
-		seedMap[i] = {}
-		for j=1,tileSize do
-			seedMap[i][j] = {}
-			if math.random() > threshold then
-				seedMap[i][j]["state"] = 1
-				seedMap[i][j]["lifeCycles"] = 1
-			else
-				seedMap[i][j]["state"] = 0
-				seedMap[i][j]["lifeCycles"] = 0
-			end
-		end
-	end
-	return seedMap
-end
-
 function love.update(dt)
 	if gamePaused == false then
 		for i,grid in ipairs(mapCollection) do
@@ -77,6 +58,45 @@ function love.draw()
 		)
 	end
 	--screenShotWrapper("forGit")
+end
+
+function love.keypressed(key)
+	if key == "up" then
+		for i,grid in ipairs(mapCollection) do
+			mapCollection[i][1] = drawSeed()
+		end
+	end
+	if key == "down" then
+		for i,grid in ipairs(mapCollection) do
+			mapCollection[i][1] = redrawCells(mapCollection[i][1])
+		end
+	end
+	if key == " " then 
+		if gamePaused == true then 
+			gamePaused = false
+		else
+			gamePaused = true
+		end
+	end
+end
+
+function drawSeed(threshold)
+	local threshold = threshold or 0.9
+	local seedMap = {}
+	for i=1,tileSize do
+		seedMap[i] = {}
+		for j=1,tileSize do
+			seedMap[i][j] = {}
+			if math.random() > threshold then
+				seedMap[i][j]["state"] = 1
+				seedMap[i][j]["lifeCycles"] = 1
+			else
+				seedMap[i][j]["state"] = 0
+				seedMap[i][j]["lifeCycles"] = 0
+			end
+		end
+	end
+	return seedMap
 end
 
 function screenShotWrapper(baseName)
@@ -122,26 +142,6 @@ function drawGrid(inputMap, alpha, satur, light)
 	end
 
 	soundSine:setPitch( (currentCells / maxCells) * 100 )
-end
-
-function love.keypressed(key)
-	if key == "up" then
-		for i,grid in ipairs(mapCollection) do
-			mapCollection[i][1] = drawSeed()
-		end
-	end
-	if key == "down" then
-		for i,grid in ipairs(mapCollection) do
-			mapCollection[i][1] = redrawCells(mapCollection[i][1])
-		end
-	end
-	if key == " " then 
-		if gamePaused == true then 
-			gamePaused = false
-		else
-			gamePaused = true
-		end
-	end
 end
 
 function redrawCells(input)
