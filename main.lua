@@ -1,8 +1,8 @@
 function love.load()
 	audioDir = "audio/"
 	stepCurrent = 0
-	tileSize = 50
-	gamePaused = true
+	tileSize = 30
+	gamePaused = false
 	maxRatio = 0
 	minRatio = 1
 	maxCells = tileSize*tileSize
@@ -11,7 +11,10 @@ function love.load()
 	colorRange = 255
 	colorMult = colorRange / tileSize
 	mapCollection = { 
-		{ drawSeed() }
+		 { drawSeed() }
+		,{ drawSeed() }
+		,{ drawSeed() }
+		,{ drawSeed() }
 	}
 
 	userInput = {}
@@ -69,11 +72,11 @@ end
 function love.draw()
 	for i=table.getn(mapCollection),1,-1 do
 		drawGrid(
-		mapCollection[i][1] 
-		,i*((colorRange/5*4)/table.getn(mapCollection))
+		 mapCollection[i][1] 
+		,i*(((colorRange/5)*4)/table.getn(mapCollection))
 		)
 	end
-	screenShotWrapper("forGit")
+	--screenShotWrapper("forGit")
 end
 
 function screenShotWrapper(baseName)
@@ -114,12 +117,9 @@ function drawGrid(inputMap, alpha, satur, light)
 	end 
 	if(currentCells / maxCells) > maxRatio then
 		maxRatio = currentCells / maxCells
-		--print("New maximum => " .. math.floor(maxRatio * 1000)/10)
 	elseif (currentCells / maxCells) < minRatio then
 		minRatio = currentCells / maxCells
-		--print("New minimum => " .. math.floor(minRatio * 1000)/10)
 	end
-	--print("Pitch => " .. ( math.floor((currentCells / maxCells) * 1000) / 10 ))
 
 	soundSine:setPitch( (currentCells / maxCells) * 100 )
 end
@@ -160,8 +160,7 @@ function redrawCells(input)
 				currentlyAlive = true
 				noneLeft = false
 			end
-			neighbours = neighbourCount(input,i,j) 
-			if stateAlive(currentlyAlive,neighbours) == true then
+			if stateAlive(currentlyAlive,neighbourCount(input,i,j)) == true then
 				tempMap[i][j]["state"] = 1
 				tempMap[i][j]["lifeCycles"] = math.min(input[i][j]["lifeCycles"] + 1,255)
 			else
@@ -171,7 +170,7 @@ function redrawCells(input)
 		end 
 	end
 	if noneLeft then
-		drawSeed()
+		tempMap = drawSeed()
 	end
 	return tempMap
 end
@@ -179,35 +178,20 @@ end
 function neighbourCount(inputmap,i,y)
 	local cellNeighbhours = 0
 	for x=-1,1 do for z=-1,1 do
-		if isInBounds(i-x) and isInBounds(y-z) then
-			if inputmap[i-x][y-z]["state"] == 1 and ((x ~= 0) or (z ~= 0)) then
+			if inputmap[boundsPadding(i-x)][boundsPadding(y-z)]["state"] == 1 and ((x ~= 0) or (z ~= 0)) then
 				cellNeighbhours = cellNeighbhours + 1
 			end
-		else 
-			local yToroidal = toroidalBoundsPadding(y-z)
-			local iToroidal = toroidalBoundsPadding(i-x)
-			if inputmap[iToroidal][yToroidal]["state"] == 1 then
-				cellNeighbhours = cellNeighbhours + 1
-			end
-		end
 	end end
 	return cellNeighbhours
 end
 
-function toroidalBoundsPadding(n)
+function boundsPadding(n)
 	if (n <= 0) then
 		return(tileSize-n)
 	elseif (n > tileSize) then
 		return(n-tileSize)
 	end
-	return n -- Other coordinate was out of bounds, return input
-end
-
-function isInBounds(n)
-	if (n > 0) and (n <= tileSize ) then
-		return true
-	end
-	return false
+	return n
 end
 
 function stateAlive(currentlyAlive,cellNeighbhours)
