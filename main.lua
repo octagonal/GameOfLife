@@ -1,20 +1,24 @@
 function love.load()
-	audioDir			= "audio/"
-	stepCurrent		= 0
-	tileSize      = 100
-	gamePaused		= true
-	maxRatio			= 0
-	minRatio			= 1
-	maxCells			= tileSize*tileSize
-	currentCells	= 0
-	drawSize      = love.window.getWidth() / tileSize
-	colorRange    = 255
-	colorMult     = colorRange / tileSize
+	audioDir = "audio/"
+	stepCurrent = 0
+	tileSize = 50
+	gamePaused = true
+	maxRatio = 0
+	minRatio = 1
+	maxCells = tileSize*tileSize
+	currentCells = 0
+	drawSize = love.window.getWidth() / tileSize
+	colorRange = 255
+	colorMult = colorRange / tileSize
 	mapCollection = { 
-		    { drawSeed() }
+		{ drawSeed() }
+		,{ drawSeed() }
+		,{ drawSeed() }
+		,{ drawSeed() }
+		,{ drawSeed() }
 	}
 
-	userInput			= {}
+	userInput = {}
 
 	love.graphics.setBackgroundColor(0,0,0,0)
 
@@ -46,10 +50,10 @@ function drawSeed(threshold)
 		for j=1,tileSize do
 			seedMap[i][j] = {}
 			if math.random() > threshold then
-				seedMap[i][j]["state"]      = 1
+				seedMap[i][j]["state"] = 1
 				seedMap[i][j]["lifeCycles"] = 1
 			else
-				seedMap[i][j]["state"]      = 0
+				seedMap[i][j]["state"] = 0
 				seedMap[i][j]["lifeCycles"] = 0
 			end
 		end
@@ -58,19 +62,20 @@ function drawSeed(threshold)
 end
 
 function love.update(dt)
-		for i,grid in ipairs(mapCollection) do
-			mapCollection[i][1] = redrawCells(mapCollection[i][1])
-		end
-		userInput = {}
+	for i,grid in ipairs(mapCollection) do
+		mapCollection[i][1] = redrawCells(mapCollection[i][1])
+	end
+	userInput = {}
 end
 
 function love.draw()
 	for i=table.getn(mapCollection),1,-1 do
-			drawGrid(
-				 mapCollection[i][1] 
-				,i*((colorRange/5*4)/table.getn(mapCollection))
-			)
+		drawGrid(
+		mapCollection[i][1] 
+		,i*((colorRange/5*4)/table.getn(mapCollection))
+		)
 	end
+	screenShotWrapper("forGit")
 end
 
 function screenShotWrapper(baseName)
@@ -116,9 +121,9 @@ function drawGrid(inputMap, alpha, satur, light)
 		minRatio = currentCells / maxCells
 		--print("New minimum => " .. math.floor(minRatio * 1000)/10)
 	end
-		--print("Pitch => " .. ( math.floor((currentCells / maxCells) * 1000) / 10 ))
+	--print("Pitch => " .. ( math.floor((currentCells / maxCells) * 1000) / 10 ))
 
-		soundSine:setPitch( (currentCells / maxCells) * 100 )
+	soundSine:setPitch( (currentCells / maxCells) * 100 )
 end
 
 function love.keypressed(key)
@@ -138,24 +143,24 @@ function redrawCells(input)
 	local tempMap = {}
 	noneLeft = true
 	for i,cellToAdd in ipairs(userInput) do
-		input[cellToAdd["y"]][cellToAdd["x"]]["state"] 			= 1
+		input[cellToAdd["y"]][cellToAdd["x"]]["state"] = 1
 		input[cellToAdd["y"]][cellToAdd["x"]]["lifeCycles"] = 1
 	end
 	for i,line in ipairs(input) do
 		tempMap[i] = {}
 		for j,cell in ipairs(input[i]) do
-			tempMap[i][j]  = {}
+			tempMap[i][j] = {}
 			currentlyAlive = false
 			if input[i][j]["state"] == 1 then
 				currentlyAlive = true
-				noneLeft       = false
+				noneLeft = false
 			end
-			neighbours = neighbourCount(input,i,j)	
+			neighbours = neighbourCount(input,i,j) 
 			if stateAlive(currentlyAlive,neighbours) == true then
-				tempMap[i][j]["state"]      = 1
+				tempMap[i][j]["state"] = 1
 				tempMap[i][j]["lifeCycles"] = input[i][j]["lifeCycles"] + 1
 			else
-				tempMap[i][j]["state"]      = 0
+				tempMap[i][j]["state"] = 0
 				tempMap[i][j]["lifeCycles"] = 0
 			end
 			if tempMap[i][j]["lifeCycles"] > 255 then
@@ -172,17 +177,17 @@ end
 function neighbourCount(inputmap,i,y)
 	local cellNeighbhours = 0
 	for x=-1,1 do for z=-1,1 do
-			if isInBounds(i-x) and isInBounds(y-z) then
-				if inputmap[i-x][y-z]["state"] == 1 and ((x ~= 0) or (z ~= 0)) then
-					cellNeighbhours = cellNeighbhours + 1
-				end
-			else 
-				local yToroidal = toroidalBoundsPadding(y-z)
-				local iToroidal = toroidalBoundsPadding(i-x)
-				if inputmap[iToroidal][yToroidal]["state"] == 1 then
-					cellNeighbhours = cellNeighbhours + 1
-				end
+		if isInBounds(i-x) and isInBounds(y-z) then
+			if inputmap[i-x][y-z]["state"] == 1 and ((x ~= 0) or (z ~= 0)) then
+				cellNeighbhours = cellNeighbhours + 1
 			end
+		else 
+			local yToroidal = toroidalBoundsPadding(y-z)
+			local iToroidal = toroidalBoundsPadding(i-x)
+			if inputmap[iToroidal][yToroidal]["state"] == 1 then
+				cellNeighbhours = cellNeighbhours + 1
+			end
+		end
 	end end
 	return cellNeighbhours
 end
@@ -223,19 +228,19 @@ function HSL(h, s, l, a)
 	local c = (1-math.abs(2*l-1))*s
 	local x = (1-math.abs(h%2-1))*c
 	local m,r,g,b = (l-.5*c), 0,0,0
-	if h < 1     then r,g,b = c,x,0
+	if h < 1 then r,g,b = c,x,0
 	elseif h < 2 then r,g,b = x,c,0
 	elseif h < 3 then r,g,b = 0,c,x
 	elseif h < 4 then r,g,b = 0,x,c
 	elseif h < 5 then r,g,b = x,0,c
-	else              r,g,b = c,0,x
+	else r,g,b = c,0,x
 	end return (r+m)*255,(g+m)*255,(b+m)*255,a
 end
 
 --[[
--1 +1	 0 +1	+1 +1
--1  0	 ****	+1  0
--1 -1	 0 -1	+1 -1
+-1 +1 0 +1 +1 +1
+-1 0 **** +1 0
+-1 -1 0 -1 +1 -1
 --]]
 
 --[[

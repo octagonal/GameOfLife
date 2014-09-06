@@ -14,3 +14,9 @@ Building
 ----------
 
     $ love .
+
+
+Screenshot
+----------
+
+![Multiple layers](misc/screen.png)
