@@ -12,10 +12,6 @@ function love.load()
 	colorMult = colorRange / tileSize
 	mapCollection = { 
 		{ drawSeed() }
-		,{ drawSeed() }
-		,{ drawSeed() }
-		,{ drawSeed() }
-		,{ drawSeed() }
 	}
 
 	userInput = {}
@@ -62,10 +58,12 @@ function drawSeed(threshold)
 end
 
 function love.update(dt)
-	for i,grid in ipairs(mapCollection) do
-		mapCollection[i][1] = redrawCells(mapCollection[i][1])
+	if gamePaused == false then
+		for i,grid in ipairs(mapCollection) do
+			mapCollection[i][1] = redrawCells(mapCollection[i][1])
+		end
+		userInput = {}
 	end
-	userInput = {}
 end
 
 function love.draw()
@@ -137,6 +135,13 @@ function love.keypressed(key)
 			mapCollection[i][1] = redrawCells(mapCollection[i][1])
 		end
 	end
+	if key == " " then 
+		if gamePaused == true then 
+			gamePaused = false
+		else
+			gamePaused = true
+		end
+	end
 end
 
 function redrawCells(input)
@@ -158,13 +163,10 @@ function redrawCells(input)
 			neighbours = neighbourCount(input,i,j) 
 			if stateAlive(currentlyAlive,neighbours) == true then
 				tempMap[i][j]["state"] = 1
-				tempMap[i][j]["lifeCycles"] = input[i][j]["lifeCycles"] + 1
+				tempMap[i][j]["lifeCycles"] = math.min(input[i][j]["lifeCycles"] + 1,255)
 			else
 				tempMap[i][j]["state"] = 0
 				tempMap[i][j]["lifeCycles"] = 0
-			end
-			if tempMap[i][j]["lifeCycles"] > 255 then
-				tempMap[i][j]["lifeCycles"] = 255
 			end
 		end 
 	end
