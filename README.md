@@ -1,6 +1,8 @@
 GameOfLife
 ==========
 
+[ ![Codeship Status for octagonal/GameOfLife](https://codeship.io/projects/f1390420-18de-0132-7c49-269ae8d73459/status)](https://codeship.io/projects/34288)
+
 Conway's Game of Life implemented in Lua (with the LÖVE framework).
 Also my first attempt at making something in Lua/LÖVE so have some mercy.
 
