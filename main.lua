@@ -1,25 +1,24 @@
 function love.load()
 	audioDir = "audio/"
+	currentCells = 0
 	stepCurrent = 0
+	maxRatio = 0; minRatio = 1
 	tileSize = 30
 	gamePaused = false
-	maxRatio = 0
-	minRatio = 1
-	maxCells = tileSize*tileSize
-	currentCells = 0
-	drawSize = love.window.getWidth() / tileSize
 	colorRange = 255
+
+	maxCells = tileSize*tileSize
+	drawSize = love.window.getWidth() / tileSize
 	colorMult = colorRange / tileSize
+
+	userInput = {
+	}
 	mapCollection = { 
 		 { drawSeed() }
 		,{ drawSeed() }
 		,{ drawSeed() }
 		,{ drawSeed() }
 	}
-
-	userInput = {}
-
-	love.graphics.setBackgroundColor(0,0,0,0)
 
 	pitchMin = 1
 	pitchMax = 5
@@ -28,6 +27,8 @@ function love.load()
 	soundSine:play()
 	soundSine:setLooping(true)
 	soundSine:setPitch(1)
+
+	love.graphics.setBackgroundColor(0,0,0,0)
 end
 
 function love.mousepressed(x,y,button)
@@ -42,6 +43,7 @@ function love.mousepressed(x,y,button)
 end
 
 function love.update(dt)
+	capFPS(dt,15)
 	if gamePaused == false then
 		for i,grid in ipairs(mapCollection) do
 			mapCollection[i][1] = redrawCells(mapCollection[i][1])
@@ -97,6 +99,12 @@ function drawSeed(threshold)
 		end
 	end
 	return seedMap
+end
+
+function capFPS(dt,n)
+	if(dt < 1/n) then
+		love.timer.sleep(1/n - dt)
+	end
 end
 
 function screenShotWrapper(baseName)
